@@ -728,10 +728,8 @@ public final class TypeFactory
      */
     public CollectionType constructCollectionType(Class<? extends Collection> collectionClass,
             JavaType elementType) {
-        // 19-Oct-2015, tatu: Allow case of no-type-variables, since it seems likely to be
-        //    a valid use case here
         return (CollectionType) _fromClass(null, collectionClass,
-                TypeBindings.create(collectionClass, elementType));
+                TypeBindings.createIfNeeded(collectionClass, elementType));
     }
 
     /**
@@ -786,7 +784,7 @@ public final class TypeFactory
      */
     public MapType constructMapType(Class<? extends Map> mapClass, JavaType keyType, JavaType valueType) {
         return (MapType) _fromClass(null, mapClass,
-                TypeBindings.create(mapClass, keyType, valueType));
+                TypeBindings.createIfNeeded(mapClass, new JavaType[] { keyType, valueType }));
     }
 
     /**

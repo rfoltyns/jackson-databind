@@ -29,6 +29,8 @@ public class TestTypeFactory
 
     abstract static class MyList extends IntermediateList<Long> { }
     abstract static class IntermediateList<E> implements List<E> { }
+    // with obfuscated type names and implementing directly
+    static abstract class LongList implements List<Long> { }
 
     @SuppressWarnings("serial")
     static class GenericList<T> extends ArrayList<T> { }
@@ -46,6 +48,8 @@ public class TestTypeFactory
     // trick here is that V now refers to key type, not value type
     static abstract class XLongMap<V> extends XXMap<V,Long> { }
     static abstract class XXMap<K,V> implements Map<K,V> { }
+    // with obfuscated type names and implementing directly
+    static abstract class StringLongMap implements Map<String,Long> { }
 
     static class SneakyBean {
         public IntLongMap intMap;
@@ -262,6 +266,11 @@ public class TestTypeFactory
         t = tf.constructCollectionType(ArrayList.class, String.class);
         assertEquals(CollectionType.class, t.getClass());
         assertSame(String.class, ((CollectionType) t).getContentType().getRawClass());
+
+        t = tf.constructCollectionType(LongList.class, Long.class);
+        assertEquals(CollectionType.class, t.getClass());
+        assertEquals(LongList.class, t.getRawClass());
+        assertEquals(Long.class, ((CollectionType) t).getContentType().getRawClass());
     }
     
     // since 2.7
@@ -311,6 +320,13 @@ public class TestTypeFactory
         assertEquals(MapType.class, t.getClass());
         assertSame(String.class, ((MapType) t).getKeyType().getRawClass());
         assertSame(Integer.class, ((MapType) t).getContentType().getRawClass());
+
+        t = tf.constructMapType(StringLongMap.class,
+                        String.class, Long.class);
+        assertEquals(MapType.class, t.getClass());
+        assertEquals(StringLongMap.class, t.getRawClass());
+        assertEquals(String.class, t.getKeyType().getRawClass());
+        assertEquals(Long.class, t.getContentType().getRawClass());
 
         // And then with TypeReference
         t = tf.constructType(new TypeReference<HashMap<String,Integer>>() { });
